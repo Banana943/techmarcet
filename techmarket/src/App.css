@@ -1,0 +1,27 @@
+/* Основные стили приложения */
+
+.App {
+  min-height: 100vh;
+  background-color: var(--background-color);
+  transition: background-color 0.3s ease;
+}
+
+.main-content {
+  padding-top: 80px; /* Отступ для фиксированного header */
+  min-height: calc(100vh - 80px);
+}
+
+/* Адаптивность для main-content */
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 70px;
+    min-height: calc(100vh - 70px);
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding-top: 60px;
+    min-height: calc(100vh - 60px);
+  }
+}
