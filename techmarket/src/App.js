@@ -2,6 +2,15 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
+import Home from './pages/Home';
+import About from './pages/About';
+import Products from './pages/Products';
+import Team from './pages/Team';
+import Gallery from './pages/Gallery';
+import Contacts from './pages/Contacts';
+import Cart from './pages/Cart';
+import Favorites from './pages/Favorites';
+import { Login, Register } from './pages/Auth';
 import './App.css';
 
 function App() {
@@ -18,16 +27,16 @@ function App() {
         <Header />
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<div className="container">Главная страница</div>} />
-            <Route path="/products" element={<div className="container">Каталог товаров</div>} />
-            <Route path="/about" element={<div className="container">О нас</div>} />
-            <Route path="/team" element={<div className="container">Наша команда</div>} />
-            <Route path="/gallery" element={<div className="container">Галерея</div>} />
-            <Route path="/contacts" element={<div className="container">Контакты</div>} />
-            <Route path="/login" element={<div className="container">Вход</div>} />
-            <Route path="/register" element={<div className="container">Регистрация</div>} />
-            <Route path="/cart" element={<div className="container">Корзина</div>} />
-            <Route path="/favorites" element={<div className="container">Избранное</div>} />
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/contacts" element={<Contacts />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/favorites" element={<Favorites />} />
           </Routes>
         </main>
       </div>

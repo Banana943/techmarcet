@@ -1,27 +1,218 @@
 /* Основные стили приложения */
+:root {
+  /* Основная цветовая схема */
+  --primary-blue: #5680E9;
+  --light-blue: #84CEEB;
+  --sky-blue: #5AB9EA;
+  --white: #FFFFFF;
+  --light-gray: #F8F9FA;
+  
+  /* Функциональные цвета */
+  --text-primary: #2D3436;
+  --text-secondary: #636E72;
+  --background: var(--white);
+  --surface: var(--light-gray);
+  --accent: var(--primary-blue);
+  --accent-light: var(--light-blue);
+  
+  /* Дополнительные оттенки */
+  --overlay: rgba(86, 128, 233, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --shadow: rgba(0, 0, 0, 0.1);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
 
 .App {
   min-height: 100vh;
-  background-color: var(--background-color);
-  transition: background-color 0.3s ease;
+  background: linear-gradient(135deg, var(--white), var(--light-gray));
+  position: relative;
+}
+
+.App::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, var(--light-blue) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--primary-blue) 0%, transparent 50%);
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .main-content {
-  padding-top: 80px; /* Отступ для фиксированного header */
+  padding-top: 80px;
   min-height: calc(100vh - 80px);
+  position: relative;
 }
 
-/* Адаптивность для main-content */
+/* Кнопки */
+.btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  background: var(--primary-blue);
+  border: none;
+  color: var(--white);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn:hover {
+  background: var(--light-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px var(--shadow);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.btn-outline:hover {
+  background: var(--primary-blue);
+  color: var(--white);
+}
+
+/* Формы */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--text-secondary);
+  background: var(--white);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 2px var(--overlay);
+}
+
+/* Карточки */
+.card {
+  background: var(--white);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 5px 15px var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px var(--shadow);
+}
+
+/* Стеклянный эффект */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 15px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px var(--shadow);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Сетка */
+.grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Контейнер */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+  .grid-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
-  .main-content {
-    padding-top: 70px;
-    min-height: calc(100vh - 70px);
+  .grid-3, .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid-2 {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 480px) {
-  .main-content {
-    padding-top: 60px;
-    min-height: calc(100vh - 60px);
+  .grid-3, .grid-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .btn {
+    width: 100%;
   }
 }

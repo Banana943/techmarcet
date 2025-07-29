@@ -1,15 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
-import { 
-  toggleTheme, 
-  toggleLanguage, 
-  setSearchQuery,
-  toggleMobileMenu,
-  closeMobileMenu 
-} from '../../store/slices/appSlice';
-import { logout } from '../../store/slices/authSlice';
-import { t } from '../../utils/translations';
 import { 
   FaSearch, 
   FaShoppingCart, 
@@ -19,201 +10,211 @@ import {
   FaBars, 
   FaTimes,
   FaUser,
-  FaSignOutAlt
+  FaSignInAlt,
+  FaUserPlus
 } from 'react-icons/fa';
+import { toggleTheme } from '../../store/slices/appSlice';
+import { t } from '../../utils/translations';
 import './Header.css';
+import logo from '../../logo.svg';
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [searchValue, setSearchValue] = useState('');
+  const location = useLocation();
   
-  // Получаем состояние из Redux
-  const { theme, language, searchQuery, isMobileMenuOpen } = useSelector(state => state.app);
-  const { isAuthenticated, user } = useSelector(state => state.auth);
-  const cartItemCount = useSelector(state => state.cart.items.reduce((total, item) => total + item.quantity, 0));
-  const favoritesCount = useSelector(state => state.favorites.items.length);
+  const { theme, language } = useSelector(state => state.app);
+  const { isAuthenticated } = useSelector(state => state.auth);
+  const cartItems = useSelector(state => state.cart.items);
+  const favoritesItems = useSelector(state => state.favorites.items);
+  
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isScrolled, setIsScrolled] = useState(false);
 
-  // Обработчики
+  // Отслеживание скролла для изменения стиля header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Закрытие меню при изменении маршрута
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery('');
+    }
+  };
+
   const handleThemeToggle = () => {
     dispatch(toggleTheme());
   };
 
-  const handleLanguageToggle = () => {
-    dispatch(toggleLanguage());
+  const handleLogoClick = () => {
+    navigate('/');
+    window.scrollTo(0, 0);
   };
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    dispatch(setSearchQuery(searchValue));
-    navigate('/products');
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchValue(e.target.value);
-  };
-
-  const handleMobileMenuToggle = () => {
-    dispatch(toggleMobileMenu());
-  };
-
-  const handleMobileMenuClose = () => {
-    dispatch(closeMobileMenu());
-  };
-
-  const handleLogout = () => {
-    dispatch(logout());
-    handleMobileMenuClose();
-  };
-
-  const handleNavClick = () => {
-    handleMobileMenuClose();
-  };
+  const cartItemsCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <header className="header" data-theme={theme}>
-      <div className="container">
-        <div className="header-content">
-          {/* Логотип */}
-          <Link to="/" className="logo" onClick={handleNavClick}>
-            <h1>{t('logo', language)}</h1>
-          </Link>
+    <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
+      <div className="header-content">
+        {/* Логотип */}
+        <Link to="/" className="logo-link" onClick={handleLogoClick}>
+          <img src={logo} alt="Логотип" className="logo" />
+          <span className="brand-text">{t('brand', language)}</span>
+        </Link>
 
-          {/* Поисковая строка */}
-          <form className="search-form" onSubmit={handleSearchSubmit}>
-            <div className="search-input-wrapper">
-              <FaSearch className="search-icon" />
-              <input
-                type="text"
-                className="search-input"
-                placeholder={t('search', language)}
-                value={searchValue}
-                onChange={handleSearchChange}
-              />
-            </div>
-          </form>
+        {/* Поиск */}
+        <form onSubmit={handleSearch} className="search-form">
+          <input
+            type="text"
+            placeholder={t('search', language)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button type="submit">
+            <FaSearch />
+          </button>
+        </form>
 
-          {/* Навигация */}
-          <nav className="nav-menu">
-            <Link to="/products" className="nav-link" onClick={handleNavClick}>
-              {t('promotions', language)}
-            </Link>
-            <Link to="/about" className="nav-link" onClick={handleNavClick}>
-              {t('about', language)}
-            </Link>
-            <Link to="/team" className="nav-link" onClick={handleNavClick}>
-              {t('team', language)}
-            </Link>
-            <Link to="/gallery" className="nav-link" onClick={handleNavClick}>
-              {t('gallery', language)}
-            </Link>
-            <Link to="/contacts" className="nav-link" onClick={handleNavClick}>
-              {t('contacts', language)}
-            </Link>
-          </nav>
-
-          {/* Правая часть */}
-          <div className="header-actions">
-            {/* Переключатель языка */}
-            <button 
-              className="action-btn language-btn" 
-              onClick={handleLanguageToggle}
-              title={t('language', language)}
-            >
-              {language === 'ru' ? 'EN' : 'RU'}
-            </button>
-
-            {/* Переключатель темы */}
-            <button 
-              className="action-btn theme-btn" 
-              onClick={handleThemeToggle}
-              title={theme === 'light' ? t('dark', language) : t('light', language)}
-            >
-              {theme === 'light' ? <FaMoon /> : <FaSun />}
-            </button>
-
-            {/* Корзина */}
-            <Link to="/cart" className="action-btn cart-btn" onClick={handleNavClick}>
-              <FaShoppingCart />
-              {cartItemCount > 0 && (
-                <span className="badge cart-badge">{cartItemCount}</span>
-              )}
-            </Link>
-
-            {/* Избранное */}
-            <Link to="/favorites" className="action-btn favorites-btn" onClick={handleNavClick}>
-              <FaHeart />
-              {favoritesCount > 0 && (
-                <span className="badge favorites-badge">{favoritesCount}</span>
-              )}
-            </Link>
-
-            {/* Аутентификация */}
-            {isAuthenticated ? (
-              <div className="user-menu">
-                <button className="action-btn user-btn">
-                  <FaUser />
-                  <span className="user-name">{user?.name}</span>
-                </button>
-                <button className="action-btn logout-btn" onClick={handleLogout}>
-                  <FaSignOutAlt />
-                </button>
-              </div>
-            ) : (
-              <div className="auth-buttons">
-                <Link to="/login" className="btn btn-outline" onClick={handleNavClick}>
-                  {t('login', language)}
-                </Link>
-                <Link to="/register" className="btn" onClick={handleNavClick}>
-                  {t('register', language)}
-                </Link>
-              </div>
-            )}
-
-            {/* Бургер-меню для мобильных */}
-            <button 
-              className="mobile-menu-btn" 
-              onClick={handleMobileMenuToggle}
-            >
-              {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
-            </button>
-          </div>
-        </div>
-
-        {/* Мобильное меню */}
-        {isMobileMenuOpen && (
-          <div className="mobile-menu">
-            <nav className="mobile-nav">
-              <Link to="/products" className="mobile-nav-link" onClick={handleNavClick}>
+        {/* Навигация */}
+        <nav className={`nav ${isMenuOpen ? 'active' : ''}`}>
+          <ul className="nav-links">
+            <li>
+              <Link 
+                to="/products" 
+                className={location.pathname === '/products' ? 'active' : ''}
+              >
                 {t('promotions', language)}
               </Link>
-              <Link to="/about" className="mobile-nav-link" onClick={handleNavClick}>
+            </li>
+            <li>
+              <Link 
+                to="/about"
+                className={location.pathname === '/about' ? 'active' : ''}
+              >
                 {t('about', language)}
               </Link>
-              <Link to="/team" className="mobile-nav-link" onClick={handleNavClick}>
+            </li>
+            <li>
+              <Link 
+                to="/team"
+                className={location.pathname === '/team' ? 'active' : ''}
+              >
                 {t('team', language)}
               </Link>
-              <Link to="/gallery" className="mobile-nav-link" onClick={handleNavClick}>
-                {t('gallery', language)}
+            </li>
+            <li>
+              <Link 
+                to="/gallery"
+                className={location.pathname === '/gallery' ? 'active' : ''}
+              >
+                {t('galleryNav', language)}
               </Link>
-              <Link to="/contacts" className="mobile-nav-link" onClick={handleNavClick}>
-                {t('contacts', language)}
+            </li>
+            <li>
+              <Link 
+                to="/contacts"
+                className={location.pathname === '/contacts' ? 'active' : ''}
+              >
+                {t('contactsNav', language)}
               </Link>
-            </nav>
-            
-            {!isAuthenticated && (
-              <div className="mobile-auth">
-                <Link to="/login" className="btn btn-outline" onClick={handleNavClick}>
-                  {t('login', language)}
-                </Link>
-                <Link to="/register" className="btn" onClick={handleNavClick}>
-                  {t('register', language)}
-                </Link>
-              </div>
+            </li>
+          </ul>
+        </nav>
+
+        {/* Действия */}
+        <div className="actions">
+          {/* Тема */}
+          <button 
+            className="action-btn theme-btn"
+            onClick={handleThemeToggle}
+            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+          >
+            {theme === 'light' ? <FaMoon /> : <FaSun />}
+          </button>
+
+          {/* Аутентификация */}
+          {isAuthenticated ? (
+            <Link to="/profile" className="action-btn profile-btn">
+              <FaUser />
+            </Link>
+          ) : (
+            <div className="auth-buttons">
+              <Link to="/login" className="action-btn">
+                <FaSignInAlt />
+                <span className="action-label">{t('login', language)}</span>
+              </Link>
+              <Link to="/register" className="action-btn">
+                <FaUserPlus />
+                <span className="action-label">{t('register', language)}</span>
+              </Link>
+            </div>
+          )}
+
+          {/* Избранное */}
+          <Link to="/favorites" className="action-btn">
+            <FaHeart />
+            {favoritesItems.length > 0 && (
+              <span className="badge">{favoritesItems.length}</span>
             )}
-          </div>
-        )}
+          </Link>
+
+          {/* Корзина */}
+          <Link to="/cart" className="action-btn">
+            <FaShoppingCart />
+            {cartItemsCount > 0 && (
+              <span className="badge">{cartItemsCount}</span>
+            )}
+          </Link>
+
+          {/* Бургер-меню */}
+          <button 
+            className="mobile-menu-btn"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+        </div>
       </div>
+
+      {/* Мобильное меню */}
+      {isMenuOpen && (
+        <div className="mobile-menu">
+          <div className="mobile-search">
+            <form onSubmit={handleSearch}>
+              <input
+                type="text"
+                placeholder={t('search', language)}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button type="submit">
+                <FaSearch />
+              </button>
+            </form>
+          </div>
+          <nav className="mobile-nav">
+            <Link to="/products">{t('promotions', language)}</Link>
+            <Link to="/about">{t('about', language)}</Link>
+            <Link to="/team">{t('team', language)}</Link>
+            <Link to="/gallery">{t('galleryNav', language)}</Link>
+            <Link to="/contacts">{t('contactsNav', language)}</Link>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

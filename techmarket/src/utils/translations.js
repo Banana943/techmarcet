@@ -14,6 +14,7 @@ export const translations = {
     register: 'Регистрация',
     cart: 'Корзина',
     favorites: 'Избранное',
+    brand: 'TechMarket',
     
     // Auth
     email: 'Email',
@@ -121,6 +122,7 @@ export const translations = {
     register: 'Register',
     cart: 'Cart',
     favorites: 'Favorites',
+    brand: 'TechMarket',
     
     // Auth
     email: 'Email',

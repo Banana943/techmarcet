@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .image-container {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .download-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .download-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate Product Images</h1>
+    <div id="images"></div>
+
+    <script>
+        const imageNames = [
+            'iphone.jpg', 'samsung.jpg', 'macbook.jpg', 'dell.jpg', 'ipad.jpg', 'tablet.jpg',
+            'headphones.jpg', 'airpods.jpg', 'watch.jpg', 'smartwatch.jpg', 'nintendo.jpg',
+            'playstation.jpg', 'xbox.jpg', 'camera.jpg', 'sony-camera.jpg', 'drone.jpg',
+            'gopro.jpg', 'tv.jpg', 'lg-tv.jpg', 'apple-tv.jpg', 'roku.jpg', 'fire-tv.jpg',
+            'chromecast.jpg', 'mouse.jpg', 'gaming-mouse.jpg', 'headset.jpg', 'keyboard.jpg',
+            'gaming-laptop.jpg', 'thinkpad.jpg', 'spectre.jpg'
+        ];
+
+        const galleryNames = [
+            'office.jpg', 'team.jpg', 'products.jpg', 'support.jpg', 'warehouse.jpg',
+            'delivery.jpg', 'quality.jpg', 'innovation.jpg', 'success.jpg', 'tech.jpg',
+            'mobile.jpg', 'web.jpg'
+        ];
+
+        function createImage(name, width = 400, height = 300, isGallery = false) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+
+            // Градиентный фон
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            if (isGallery) {
+                gradient.addColorStop(0, '#667eea');
+                gradient.addColorStop(1, '#764ba2');
+            } else {
+                gradient.addColorStop(0, '#f093fb');
+                gradient.addColorStop(1, '#f5576c');
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Добавляем текст
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const displayName = name.replace('.jpg', '').replace('-', ' ').toUpperCase();
+            ctx.fillText(displayName, width / 2, height / 2);
+
+            // Добавляем подзаголовок
+            ctx.font = '16px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fillText('TechMarket', width / 2, height / 2 + 40);
+
+            return canvas;
+        }
+
+        function downloadImage(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/jpeg', 0.8);
+            link.click();
+        }
+
+        // Создаем изображения для товаров
+        const imagesContainer = document.getElementById('images');
+        
+        // Создаем изображения для товаров
+        imageNames.forEach(name => {
+            const container = document.createElement('div');
+            container.className = 'image-container';
+            
+            const canvas = createImage(name);
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'download-btn';
+            downloadBtn.textContent = `Download ${name}`;
+            downloadBtn.onclick = () => downloadImage(canvas, name);
+            
+            container.appendChild(canvas);
+            container.appendChild(downloadBtn);
+            imagesContainer.appendChild(container);
+        });
+
+        // Создаем изображения для галереи
+        galleryNames.forEach(name => {
+            const container = document.createElement('div');
+            container.className = 'image-container';
+            
+            const canvas = createImage(name, 400, 300, true);
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'download-btn';
+            downloadBtn.textContent = `Download ${name}`;
+            downloadBtn.onclick = () => downloadImage(canvas, name);
+            
+            container.appendChild(canvas);
+            container.appendChild(downloadBtn);
+            imagesContainer.appendChild(container);
+        });
+    </script>
+</body>
+</html> 
